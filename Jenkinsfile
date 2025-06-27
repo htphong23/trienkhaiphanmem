@@ -2,30 +2,34 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone') {
-            steps {
-                git branch: 'main', url: 'https://github.com/htphong23/trienkhaiphanmem.git'
-            }
-        }
         stage('Restore') {
             steps {
-                bat 'dotnet restore'
+                sh 'dotnet restore'
             }
         }
         stage('Build') {
             steps {
-                bat 'dotnet build -c Release'
+                sh 'dotnet build --configuration Release'
             }
         }
         stage('Publish') {
             steps {
-                bat 'dotnet publish -c Release -o publish'
+                sh 'dotnet publish -c Release -o publish'
             }
         }
         stage('Deploy') {
             steps {
-                bat 'xcopy /s /y publish\\* "C:\\inetpub\\wwwroot\\food-ordering"'
+                sh 'cp -r publish/* /Users/phong/Desktop/deploy-folder'
             }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ CI/CD hoàn tất!'
+        }
+        failure {
+            echo '❌ Có lỗi khi build/deploy.'
         }
     }
 }
